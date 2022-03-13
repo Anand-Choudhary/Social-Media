@@ -109,19 +109,19 @@ router.get('/follow/unfollow/:id', async (req,res)=>{
             {
                 await user.updateOne({$push: {following:req.params.id}})
                 await currentUser.updateOne({$push:{followers:req.body.userId}})
-                return res.status(500).json("User has been followed");
+                return res.status(200).json("User has been followed");
             }
             else{
                 await user.updateOne({$pull: {following:req.params.id}})
                 await currentUser.updateOne({$pull:{followers:req.body.userId}})
-                return res.status(500).json("User has been unfollowed");
+                return res.status(200).json("User has been unfollowed");
             }
         } catch (error) {
             return res.status(500).json(error,"neend me code likha hai");
         }
     }
     else{
-        return res.status(500).json("Apne app ko kaise follow krega bhai");
+        return res.status(403).json("Apne app ko kaise follow krega bhai");
     }
 })
 
