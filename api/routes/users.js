@@ -1,37 +1,38 @@
 const router = require("express").Router();
 
 const bcrypt = require("bcrypt");
+const passport = require("passport");
 
 const User = require("../models/User");
 const validate = require("../models/User");
 
 
 
-router.post('/', async (req, res) => {
-    // First Validate The Request
-    const { error } = validate(req.body);
-    if (error) {
-        return res.status(400).send(error);
-    }
+// router.post('/', async (req, res) => {
+//     // First Validate The Request
+//     const { error } = validate(req.body);
+//     if (error) {
+//         return res.status(400).send(error);
+//     }
 
-    // Check if this user already exisits
-    let user = await User.findOne({ email: req.body.email });
-    if (user) {
-        return res.status(400).send('That user already exisits!');
-    } else {
-        //bcrypt the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-        // Insert the new user if they do not exist yet
-        user = new User({
-            username: req.body.username,
-            email: req.body.email,
-            password: hashedPassword,
-        });
-        await user.save();
-        res.send(user);
-    }
-});
+//     // Check if this user already exisits
+//     let user = await User.findOne({ email: req.body.email });
+//     if (user) {
+//         return res.status(400).send('That user already exisits!');
+//     } else {
+//         //bcrypt the password
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(req.body.password, salt);
+//         // Insert the new user if they do not exist yet
+//         user = new User({
+//             username: req.body.username,
+//             email: req.body.email,
+//             password: hashedPassword,
+//         });
+//         await user.save();
+//         res.send(user);
+//     }
+// });
 
 router.put('/:id',async (req,res)=>{
     if(req.body.userId === req.params.id){
@@ -124,5 +125,10 @@ router.get('/follow/unfollow/:id', async (req,res)=>{
         return res.status(403).json("Apne app ko kaise follow krega bhai");
     }
 })
+
+router.post('/create-session',passport.authenticate(
+    'local',
+    {failureRedirect:'/users/sign-in'},
+), userController.createSession)
 
 module.exports = router;
